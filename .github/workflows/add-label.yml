@@ -1,0 +1,19 @@
+name: Check Label
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check label
+        run: |
+          echo "The label ${{ github.event.label.name }} was added to issue #${{ github.event.issue.number }}"
+      - name: Check for specific label
+        if: contains(github.event.issue.labels.*.name, 'your-label')
+
+        run: |
+          echo "Label found!"
