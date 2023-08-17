@@ -10,7 +10,7 @@ on:
 
 jobs:
   doc:
-    name: Need Documentation
+    name: Need Documentations
     runs-on: ubuntu-latest
     if: ${{ (github.event.pull_request.merged == true || github.event.label.name == 'need documentation') && contains(github.event.pull_request.labels.*.name, 'need documentation') }}
     steps:
