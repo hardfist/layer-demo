@@ -1,19 +1,35 @@
-name: Check Label
+# Create an issue in rspack-website when a PR with the "need documentation" label is merged
+
+name: Need Documentation
 
 on:
-  issues:
-    types: [labeled]
+  pull_request:
+    types:
+      - closed
+      - labeled
 
 jobs:
-  check-label:
+  doc:
+    name: Need Documentation
     runs-on: ubuntu-latest
-
+    if: ${{ (github.event.pull_request.merged == true || github.event.label.name == 'need documentation') && contains(github.event.pull_request.labels.*.name, 'need documentation') }}
     steps:
-      - name: Check label
-        run: |
-          echo "The label ${{ github.event.label.name }} was added to issue #${{ github.event.issue.number }}"
-      - name: Check for specific label
-        if: contains(github.event.issue.labels.*.name, 'your-label')
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.RSPACK_WEBSITE_ACCESS_TOKEN }}
+          script: |
+            console.log('sync website');
+            const title = "Document rspack change: " + context.payload.pull_request.title;
+            const body = "See pull request:\n* " + context.payload.pull_request.html_url;
 
-        run: |
-          echo "Label found!"
+            console.log(title);
+            console.log(body);
+
+            const result = await github.rest.issues.create({
+              owner: 'web-infra-dev',
+              repo: 'rspack-website',
+              title: title,
+              body: body,
+            });
+
+            console.log(result);
